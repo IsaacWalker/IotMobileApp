@@ -1,24 +1,40 @@
 package com.example.iotmobileapp.workerservice;
 
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 
 import com.example.iotmobileapp.config.Config;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Definitions.BluetoothScan;
+import com.example.iotmobileapp.workerservice.Definitions.Kinematics;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
 import com.example.iotmobileapp.workerservice.Definitions.WifiScan;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,47 +47,67 @@ public class ScannerWorker implements Runnable
 
     private final BluetoothAdapter m_bluetoothAdapter;
 
-    private volatile Scan _scans;
+    private final FusedLocationProviderClient m_locationClient;
+
+    private final SensorManager m_sensorManager;
+
+    private volatile Scan _scan;
     private volatile boolean _isWifiComplete = false;
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    public ScannerWorker(ISharedDatabase<Scan> _database, WifiManager wifiManager, BluetoothManager bluetoothManager)
+    public ScannerWorker(ISharedDatabase<Scan> _database,
+                         WifiManager wifiManager,
+                         BluetoothManager bluetoothManager,
+                         FusedLocationProviderClient locationClient,
+                         SensorManager sensorManager)
     {
         m_database = _database;
         m_wifiManager = wifiManager;
         m_bluetoothAdapter = bluetoothManager.getAdapter();
+        m_locationClient = locationClient;
+        m_sensorManager = sensorManager;
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void run()
+
     {
-        m_wifiManager.setWifiEnabled(true);
 
         while(true)
         {
-            _scans = new Scan();
-            _scans.bluetoothScans = new ArrayList<BluetoothScan>();
+            m_wifiManager.setWifiEnabled(true);
+            m_sensorManager.registerListener(accelerometerListener,
+                    m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                    SensorManager.SENSOR_DELAY_NORMAL);
+
+            m_sensorManager.registerListener(orientationListener,
+                    m_sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
+                    SensorManager.SENSOR_DELAY_NORMAL);
+
+            _scan = new Scan();
+            _scan.kinematics = new Kinematics();
+            _scan.bluetoothScans = new ArrayList<BluetoothScan>();
             _isWifiComplete = false;
 
             boolean wifi_scan_success = m_wifiManager.startScan();
             m_bluetoothAdapter.startDiscovery();
+           Task<Location> locTask = m_locationClient.getLastLocation();
+            locTask.addOnSuccessListener(locationListener);
 
-            Log.d("Scan Success", "Success: "+wifi_scan_success);
-
-            while(!_isWifiComplete)
-            {
-                try
-                {
-                    Thread.sleep(400);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                Thread.sleep(Config.ScanningTime.Value());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
 
             m_bluetoothAdapter.cancelDiscovery();
+            while(!_isWifiComplete){}
 
-            m_database.insert(_scans);
-            Log.d("Scan Numbers:", ""+ _scans.wifiScans.size() + " : " + _scans.bluetoothScans.size());
+
+            Log.d("Scan Success", "Wifi: " + _scan.wifiScans.size() + " Bluetooth: "+
+                    _scan.bluetoothScans.size() + "Altitude: " + _scan.kinematics.altitude);
+            m_database.insert(_scan);
 
             try
             {
@@ -88,7 +124,6 @@ public class ScannerWorker implements Runnable
         @Override
         public void onReceive(Context context, Intent intent) {
             List<ScanResult> scanResults = m_wifiManager.getScanResults();
-            Log.d("Scan",""+ scanResults.size());
 
             ArrayList<WifiScan> wifiScans = new ArrayList<>();
             for (ScanResult scanResult : scanResults)
@@ -103,7 +138,7 @@ public class ScannerWorker implements Runnable
                 wifiScans.add(wifiScan);
             }
 
-            _scans.wifiScans = wifiScans;
+            _scan.wifiScans = wifiScans;
             _isWifiComplete = true;
         }
     };
@@ -121,8 +156,60 @@ public class ScannerWorker implements Runnable
                 bluetoothScan.Type = device.getType();
                 bluetoothScan.Address = device.getAddress();
 
-                _scans.bluetoothScans.add(bluetoothScan);
+                _scan.bluetoothScans.add(bluetoothScan);
             }
         }
     };
+
+    SensorEventListener accelerometerListener = new SensorEventListener()
+    {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            _scan.kinematics.acceleration_x = sensorEvent.values[0];
+            _scan.kinematics.acceleration_y = sensorEvent.values[1];
+            _scan.kinematics.acceleration_z = sensorEvent.values[2];
+            m_sensorManager.unregisterListener(this);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    };
+
+    SensorEventListener orientationListener = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+
+            Log.d("Orientation", "" + sensorEvent.values[0]);
+            _scan.kinematics.azimuth = sensorEvent.values[0];
+            _scan.kinematics.pitch = sensorEvent.values[1];
+            _scan.kinematics.roll = sensorEvent.values[2];
+
+            m_sensorManager.unregisterListener(this);
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    };
+
+    OnSuccessListener locationListener = new OnSuccessListener<Location>() {
+    @Override
+    public void onSuccess(Location location)
+    {
+        if(location!=null)
+        {
+           // Log.d("Location", "" + location.getAltitude());
+            _scan.kinematics.altitude = location.getAltitude();
+            _scan.kinematics.latitude = location.getLatitude();
+            _scan.kinematics.longitude = location.getLongitude();
+        }
+    }
+    };
+
+
+
+
 }

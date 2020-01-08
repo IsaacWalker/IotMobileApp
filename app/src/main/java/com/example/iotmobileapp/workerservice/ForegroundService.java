@@ -1,5 +1,7 @@
 package com.example.iotmobileapp.workerservice;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,18 +13,25 @@ import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
+import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 import com.example.iotmobileapp.MainActivity;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Database.SharedDatabase;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
@@ -77,19 +86,23 @@ public class ForegroundService extends Service {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void startWorkers()
-    {
-        WifiManager wifiManagerManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
-        BluetoothManager bluetoothManager = (BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
-        ISharedDatabase<Scan> scanDatabase = new SharedDatabase<Scan>();
+    private void startWorkers() {
 
-        ScannerWorker scannerWorker = new ScannerWorker(scanDatabase,wifiManagerManager, bluetoothManager);
+        WifiManager wifiManagerManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        BluetoothManager bluetoothManager = (BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
+        FusedLocationProviderClient locationProviderClient = LocationServices.getFusedLocationProviderClient(getApplicationContext());
+        ISharedDatabase<Scan> scanDatabase = new SharedDatabase<Scan>();
+        SensorManager sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        ScannerWorker scannerWorker = new ScannerWorker(scanDatabase, wifiManagerManager, bluetoothManager, locationProviderClient, sensorManager);
         getApplicationContext().registerReceiver(scannerWorker.wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         getApplicationContext().registerReceiver(scannerWorker.bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+
         PusherWorker pusherWorker = new PusherWorker(scanDatabase);
 
         new Thread(pusherWorker).start();
         new Thread(scannerWorker).start();
     }
+
 
 }
