@@ -30,6 +30,8 @@ import com.example.iotmobileapp.MainActivity;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Database.SharedDatabase;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
+import com.example.iotmobileapp.workerservice.serviceclient.APIClient;
+import com.example.iotmobileapp.workerservice.serviceclient.IScanServiceClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -98,7 +100,7 @@ public class ForegroundService extends Service {
         getApplicationContext().registerReceiver(scannerWorker.wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         getApplicationContext().registerReceiver(scannerWorker.bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
-        PusherWorker pusherWorker = new PusherWorker(scanDatabase);
+        PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://google.com").create(IScanServiceClient.class));
 
         new Thread(pusherWorker).start();
         new Thread(scannerWorker).start();

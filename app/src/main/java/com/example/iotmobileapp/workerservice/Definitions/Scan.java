@@ -1,15 +1,18 @@
 package com.example.iotmobileapp.workerservice.Definitions;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class Scan
 {
-    public int Id = 4;
-
+    @SerializedName("kinematics")
     public Kinematics kinematics;
 
+    @SerializedName("wifi_scans")
     public List<WifiScan> wifiScans;
 
+    @SerializedName("bluetooth_scans")
     public List<BluetoothScan> bluetoothScans;
 }
 

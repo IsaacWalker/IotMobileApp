@@ -15,16 +15,11 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 
 import com.example.iotmobileapp.config.Config;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
@@ -90,24 +85,22 @@ public class ScannerWorker implements Runnable
             _scan.bluetoothScans = new ArrayList<BluetoothScan>();
             _isWifiComplete = false;
 
-            boolean wifi_scan_success = m_wifiManager.startScan();
-            m_bluetoothAdapter.startDiscovery();
-           Task<Location> locTask = m_locationClient.getLastLocation();
-            locTask.addOnSuccessListener(locationListener);
+            if(m_wifiManager.startScan() && m_bluetoothAdapter.startDiscovery())
+            {
+                Task<Location> locTask = m_locationClient.getLastLocation();
+                locTask.addOnSuccessListener(locationListener);
 
-            try {
-                Thread.sleep(Config.ScanningTime.Value());
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                try {
+                    Thread.sleep(Config.ScanningTime.Value());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                m_bluetoothAdapter.cancelDiscovery();
+                while(!_isWifiComplete){}
+
+                m_database.insert(_scan);
             }
-
-            m_bluetoothAdapter.cancelDiscovery();
-            while(!_isWifiComplete){}
-
-
-            Log.d("Scan Success", "Wifi: " + _scan.wifiScans.size() + " Bluetooth: "+
-                    _scan.bluetoothScans.size() + "Altitude: " + _scan.kinematics.altitude);
-            m_database.insert(_scan);
 
             try
             {
@@ -181,7 +174,6 @@ public class ScannerWorker implements Runnable
         @Override
         public void onSensorChanged(SensorEvent sensorEvent) {
 
-            Log.d("Orientation", "" + sensorEvent.values[0]);
             _scan.kinematics.azimuth = sensorEvent.values[0];
             _scan.kinematics.pitch = sensorEvent.values[1];
             _scan.kinematics.roll = sensorEvent.values[2];
@@ -201,7 +193,6 @@ public class ScannerWorker implements Runnable
     {
         if(location!=null)
         {
-           // Log.d("Location", "" + location.getAltitude());
             _scan.kinematics.altitude = location.getAltitude();
             _scan.kinematics.latitude = location.getLatitude();
             _scan.kinematics.longitude = location.getLongitude();
