@@ -23,10 +23,9 @@ import androidx.annotation.RequiresApi;
 
 import com.example.iotmobileapp.config.Config;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
-import com.example.iotmobileapp.workerservice.Definitions.BluetoothScan;
 import com.example.iotmobileapp.workerservice.Definitions.Kinematics;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
-import com.example.iotmobileapp.workerservice.Definitions.WifiScan;
+import com.example.iotmobileapp.workerservice.Definitions.WifiDevice;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -81,8 +80,9 @@ public class ScannerWorker implements Runnable
                     SensorManager.SENSOR_DELAY_NORMAL);
 
             _scan = new Scan();
+
             _scan.kinematics = new Kinematics();
-            _scan.bluetoothScans = new ArrayList<BluetoothScan>();
+            _scan.bluetoothDevices= new ArrayList<com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice>();
             _isWifiComplete = false;
 
             if(m_wifiManager.startScan() && m_bluetoothAdapter.startDiscovery())
@@ -104,7 +104,7 @@ public class ScannerWorker implements Runnable
 
             try
             {
-                Thread.sleep(Config.PusherSleepTime.Value());
+                Thread.sleep(Config.ScannerSleepTime.Value());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -118,20 +118,21 @@ public class ScannerWorker implements Runnable
         public void onReceive(Context context, Intent intent) {
             List<ScanResult> scanResults = m_wifiManager.getScanResults();
 
-            ArrayList<WifiScan> wifiScans = new ArrayList<>();
+            ArrayList<WifiDevice> wifiScans = new ArrayList<>();
             for (ScanResult scanResult : scanResults)
             {
-                WifiScan wifiScan = new WifiScan();
-                wifiScan.SSID = scanResult.SSID;
-                wifiScan.BSSID = scanResult.BSSID;
-                wifiScan.capabilities = scanResult.capabilities;
-                wifiScan.level = scanResult.level;
-                wifiScan.venueName = scanResult.venueName.toString();
-                wifiScan.operatorFriendlyName = scanResult.operatorFriendlyName.toString();
-                wifiScans.add(wifiScan);
+                WifiDevice wifiDevice= new WifiDevice();
+                wifiDevice.Timestamp = scanResult.timestamp;
+                wifiDevice.SSID = scanResult.SSID;
+                wifiDevice.BSSID = scanResult.BSSID;
+                wifiDevice.capabilities = scanResult.capabilities;
+                wifiDevice.level = scanResult.level;
+                wifiDevice.venueName = scanResult.venueName.toString();
+                wifiDevice.operatorFriendlyName = scanResult.operatorFriendlyName.toString();
+                wifiScans.add(wifiDevice);
             }
 
-            _scan.wifiScans = wifiScans;
+            _scan.wifiDevices = wifiScans;
             _isWifiComplete = true;
         }
     };
@@ -144,12 +145,14 @@ public class ScannerWorker implements Runnable
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
 
-                BluetoothScan bluetoothScan = new BluetoothScan();
-                bluetoothScan.Name = device.getName();
-                bluetoothScan.Type = device.getType();
-                bluetoothScan.Address = device.getAddress();
+                com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice bluetoothDevice
+                        = new com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice();
+                bluetoothDevice.Timestamp = System.currentTimeMillis();
+                bluetoothDevice.Name = device.getName();
+                bluetoothDevice.Type = device.getType();
+                bluetoothDevice.Address = device.getAddress();
 
-                _scan.bluetoothScans.add(bluetoothScan);
+                _scan.bluetoothDevices.add(bluetoothDevice);
             }
         }
     };
@@ -193,6 +196,7 @@ public class ScannerWorker implements Runnable
     {
         if(location!=null)
         {
+            _scan.kinematics.timestamp = location.getTime();
             _scan.kinematics.altitude = location.getAltitude();
             _scan.kinematics.latitude = location.getLatitude();
             _scan.kinematics.longitude = location.getLongitude();

@@ -7,6 +7,7 @@ import com.example.iotmobileapp.config.Config;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
 import com.example.iotmobileapp.workerservice.Definitions.ScanBatch;
+import com.example.iotmobileapp.workerservice.identity.IIdentity;
 import com.example.iotmobileapp.workerservice.serviceclient.IScanServiceClient;
 import com.google.gson.Gson;
 
@@ -25,10 +26,13 @@ public class PusherWorker implements Runnable
 
     private final IScanServiceClient m_scanServiceClient;
 
-    public PusherWorker(ISharedDatabase<Scan> scanDatabase, IScanServiceClient scanServiceClient)
+    private final IIdentity m_userIdentity;
+
+    public PusherWorker(ISharedDatabase<Scan> scanDatabase, IScanServiceClient scanServiceClient, IIdentity userIdentity)
     {
         m_scanDatabase = scanDatabase;
         m_scanServiceClient = scanServiceClient;
+        m_userIdentity = userIdentity;
     }
 
     @Override
@@ -38,16 +42,16 @@ public class PusherWorker implements Runnable
         {
             List<Scan> scans = m_scanDatabase.take(Config.PusherBatchSize.Value());
 
-            if(scans != null)
+            if(scans != null && scans.size() > 0)
             {
-                ScanBatch batch = new ScanBatch(scans);
+                ScanBatch batch = new ScanBatch(m_userIdentity.GetDeviceId(), scans);
                 Call<Void> call = m_scanServiceClient.InsertScans(batch);
                 call.enqueue(scanCallback);
             }
 
             try
             {
-                Thread.sleep(Config.ScannerSleepTime.Value());
+                Thread.sleep(Config.PusherSleepTime.Value());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

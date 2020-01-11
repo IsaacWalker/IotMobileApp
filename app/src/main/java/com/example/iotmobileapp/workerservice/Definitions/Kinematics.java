@@ -4,6 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class Kinematics
 {
+    @SerializedName("timestamp")
+    public long timestamp;
+
     // GPS position
     @SerializedName("altitude")
     public double altitude;

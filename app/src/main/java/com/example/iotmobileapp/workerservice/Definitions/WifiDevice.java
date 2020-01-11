@@ -2,8 +2,12 @@ package com.example.iotmobileapp.workerservice.Definitions;
 
 import com.google.gson.annotations.SerializedName;
 
-public class WifiScan
+public class WifiDevice
 {
+
+    @SerializedName("timestamp")
+    public long Timestamp;
+
     @SerializedName("bssid")
     public String BSSID;
 
@@ -18,9 +22,6 @@ public class WifiScan
 
     @SerializedName("operator_friendly_name")
     public String operatorFriendlyName;
-
-    @SerializedName("timestamp")
-    public long timestamp;
 
     @SerializedName("venue_name")
     public String venueName;

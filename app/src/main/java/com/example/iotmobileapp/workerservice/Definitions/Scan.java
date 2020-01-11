@@ -6,14 +6,17 @@ import java.util.List;
 
 public class Scan
 {
+    @SerializedName("timestamp")
+    public long Timestamp = System.currentTimeMillis();
+
     @SerializedName("kinematics")
     public Kinematics kinematics;
 
-    @SerializedName("wifi_scans")
-    public List<WifiScan> wifiScans;
+    @SerializedName("wifi_devices")
+    public List<WifiDevice> wifiDevices;
 
-    @SerializedName("bluetooth_scans")
-    public List<BluetoothScan> bluetoothScans;
+    @SerializedName("bluetooth_devices")
+    public List<BluetoothDevice> bluetoothDevices;
 }
 
 

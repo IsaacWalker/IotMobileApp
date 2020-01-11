@@ -6,11 +6,15 @@ import java.util.List;
 
 public class ScanBatch
 {
+    @SerializedName("device_id")
+    public long DeviceId;
+
     @SerializedName("scans")
     public List<Scan> scans;
 
-    public ScanBatch(List<Scan> scans)
+    public ScanBatch(long deviceId, List<Scan> scans)
     {
+        this.DeviceId = deviceId;
         this.scans = scans;
     }
 
