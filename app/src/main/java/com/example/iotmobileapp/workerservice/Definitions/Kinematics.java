@@ -28,12 +28,12 @@ public class Kinematics
     public double roll;
 
     // Linear Acceleration
-    @SerializedName("acceleration_x")
+    @SerializedName("accelerationX")
     public double acceleration_x;
 
-    @SerializedName("acceleration_y")
+    @SerializedName("accelerationY")
     public double acceleration_y;
 
-    @SerializedName("acceleration_z")
+    @SerializedName("accelerationZ")
     public double acceleration_z;
 }

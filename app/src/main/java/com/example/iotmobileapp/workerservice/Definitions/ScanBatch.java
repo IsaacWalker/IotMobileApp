@@ -6,7 +6,7 @@ import java.util.List;
 
 public class ScanBatch
 {
-    @SerializedName("device_id")
+    @SerializedName("deviceId")
     public long DeviceId;
 
     @SerializedName("scans")

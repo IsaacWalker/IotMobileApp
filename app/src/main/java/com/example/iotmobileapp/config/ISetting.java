@@ -4,5 +4,5 @@ public interface ISetting<T>
 {
     T Value();
 
-    String Id();
+    String Name();
 }

@@ -20,9 +20,9 @@ public class WifiDevice
     @SerializedName("level")
     public int level;
 
-    @SerializedName("operator_friendly_name")
+    @SerializedName("operatorFriendlyName")
     public String operatorFriendlyName;
 
-    @SerializedName("venue_name")
+    @SerializedName("venueName")
     public String venueName;
 }

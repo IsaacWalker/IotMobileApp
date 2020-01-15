@@ -101,8 +101,8 @@ public class ForegroundService extends Service {
         getApplicationContext().registerReceiver(scannerWorker.wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         getApplicationContext().registerReceiver(scannerWorker.bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
-        PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://google.com").create(IScanServiceClient.class
-                ),new UserIdentity(0));
+        PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://www.iotrelationshipfyp.com")
+                .create(IScanServiceClient.class),new UserIdentity(0));
 
         new Thread(pusherWorker).start();
         new Thread(scannerWorker).start();

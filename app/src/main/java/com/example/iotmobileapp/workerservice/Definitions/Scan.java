@@ -12,10 +12,10 @@ public class Scan
     @SerializedName("kinematics")
     public Kinematics kinematics;
 
-    @SerializedName("wifi_devices")
+    @SerializedName("wifiDevices")
     public List<WifiDevice> wifiDevices;
 
-    @SerializedName("bluetooth_devices")
+    @SerializedName("bluetoothDevices")
     public List<BluetoothDevice> bluetoothDevices;
 }
 

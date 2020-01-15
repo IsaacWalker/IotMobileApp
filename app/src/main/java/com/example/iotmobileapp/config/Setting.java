@@ -2,14 +2,15 @@ package com.example.iotmobileapp.config;
 
 public class Setting<T> implements ISetting<T> {
 
-    private String _id;
+    private String _name;
 
     private T _value;
 
-    public Setting(String id, T initVal)
+    public Setting(String name, T initVal)
     {
-        _id = id;
+        _name = name;
         _value = initVal;
+        ConfigProvider.RegisterSetting(this);
     }
 
 
@@ -18,10 +19,18 @@ public class Setting<T> implements ISetting<T> {
         return _value;
     }
 
+
     @Override
-    public String Id()
+    public String Name()
     {
-        return _id;
+        return _name;
     }
+
+
+    public void SetValue(T value)
+    {
+        _value = value;
+    }
+
 
 }

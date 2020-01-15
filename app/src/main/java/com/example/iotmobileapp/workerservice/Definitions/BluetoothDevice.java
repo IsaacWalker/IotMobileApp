@@ -11,7 +11,7 @@ public class BluetoothDevice
     public String Name;
 
     @SerializedName("type")
-    public int Type;
+    public String Type;
 
     @SerializedName("address")
     public String Address;

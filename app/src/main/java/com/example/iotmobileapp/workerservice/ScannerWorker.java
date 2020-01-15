@@ -71,6 +71,10 @@ public class ScannerWorker implements Runnable
         while(true)
         {
             m_wifiManager.setWifiEnabled(true);
+
+            _scan = new Scan();
+            _scan.kinematics = new Kinematics();
+
             m_sensorManager.registerListener(accelerometerListener,
                     m_sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                     SensorManager.SENSOR_DELAY_NORMAL);
@@ -79,9 +83,7 @@ public class ScannerWorker implements Runnable
                     m_sensorManager.getDefaultSensor(Sensor.TYPE_GAME_ROTATION_VECTOR),
                     SensorManager.SENSOR_DELAY_NORMAL);
 
-            _scan = new Scan();
 
-            _scan.kinematics = new Kinematics();
             _scan.bluetoothDevices= new ArrayList<com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice>();
             _isWifiComplete = false;
 
@@ -149,7 +151,7 @@ public class ScannerWorker implements Runnable
                         = new com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice();
                 bluetoothDevice.Timestamp = System.currentTimeMillis();
                 bluetoothDevice.Name = device.getName();
-                bluetoothDevice.Type = device.getType();
+                bluetoothDevice.Type = "Type";
                 bluetoothDevice.Address = device.getAddress();
 
                 _scan.bluetoothDevices.add(bluetoothDevice);
