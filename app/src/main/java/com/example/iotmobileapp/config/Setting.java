@@ -4,7 +4,7 @@ public class Setting<T> implements ISetting<T> {
 
     private String _name;
 
-    private T _value;
+    private volatile T _value;
 
     public Setting(String name, T initVal)
     {
@@ -27,7 +27,7 @@ public class Setting<T> implements ISetting<T> {
     }
 
 
-    public void SetValue(T value)
+    public synchronized void SetValue(T value)
     {
         _value = value;
     }

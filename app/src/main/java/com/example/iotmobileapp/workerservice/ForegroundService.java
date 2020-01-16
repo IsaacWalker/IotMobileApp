@@ -20,6 +20,7 @@ import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.IBinder;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -27,12 +28,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 import com.example.iotmobileapp.MainActivity;
+import com.example.iotmobileapp.config.Config;
+import com.example.iotmobileapp.config.ConfigProvider;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Database.SharedDatabase;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
 import com.example.iotmobileapp.workerservice.identity.UserIdentity;
 import com.example.iotmobileapp.workerservice.serviceclient.APIClient;
 import com.example.iotmobileapp.workerservice.serviceclient.IScanServiceClient;
+import com.example.iotmobileapp.workerservice.serviceclient.ISettingServiceClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
@@ -104,8 +108,10 @@ public class ForegroundService extends Service {
         PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://www.iotrelationshipfyp.com")
                 .create(IScanServiceClient.class),new UserIdentity(0));
 
-        new Thread(pusherWorker).start();
-        new Thread(scannerWorker).start();
+       // new Thread(pusherWorker).start();
+       // new Thread(scannerWorker).start();
+        new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
+                .create(ISettingServiceClient.class), new ConfigProvider())).start();
     }
 
 

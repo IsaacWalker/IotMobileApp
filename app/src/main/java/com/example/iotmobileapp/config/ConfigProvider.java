@@ -1,5 +1,7 @@
 package com.example.iotmobileapp.config;
 
+import android.util.Log;
+
 import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.Definitions.SettingModel;
 
@@ -16,6 +18,16 @@ public class ConfigProvider implements IConfigProvider
     private int _currentConfigId = UNDEFINED_CONFIG_ID;
 
 
+    public ConfigProvider()
+    {
+        try {
+            Class.forName("com.example.iotmobileapp.config.Config");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+
     public static void RegisterSetting(Setting setting)
     {
         if(!m_settingMap.containsKey(setting.Name()))
@@ -30,9 +42,11 @@ public class ConfigProvider implements IConfigProvider
         {
             if(m_settingMap.containsKey(settingModel.name))
             {
+
                 Setting setting = m_settingMap.get(settingModel.name);
 
                 Object newValue = parseValue(settingModel.type, settingModel.value);
+
                 setting.SetValue(newValue);
 
                 _currentConfigId = config.Id;

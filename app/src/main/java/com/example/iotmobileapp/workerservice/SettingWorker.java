@@ -2,6 +2,7 @@ package com.example.iotmobileapp.workerservice;
 
 import android.util.Log;
 
+import com.example.iotmobileapp.config.Config;
 import com.example.iotmobileapp.config.IConfigProvider;
 import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.serviceclient.ISettingServiceClient;
@@ -28,7 +29,22 @@ public class SettingWorker implements Runnable
     @Override
     public void run()
     {
+        while(true)
+        {
+            Log.d("Setting Value: ", "" +Config.PusherBatchSize.Value());
+            Log.d("Setting Value: ", "" +Config.PusherSleepTime.Value());
+            Log.d("Setting Value: ", "" +Config.ScannerSleepTime.Value());
+            Log.d("Setting Value: ", "" +Config.ScanningTime.Value());
 
+            Call<Configuration> call = m_serviceClient.GetCurrentConfig();
+            call.enqueue(configurationCallback);
+
+            try {
+                Thread.sleep(4000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 
