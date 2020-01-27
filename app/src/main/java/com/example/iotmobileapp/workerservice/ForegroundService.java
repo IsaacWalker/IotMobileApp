@@ -18,6 +18,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -43,6 +44,9 @@ import com.google.android.gms.location.LocationServices;
 public class ForegroundService extends Service {
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
+    private final IBinder binder = new LocalBinder();
+
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -51,20 +55,20 @@ public class ForegroundService extends Service {
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String input = intent.getStringExtra("inputExtra");
+        int id = intent.getIntExtra("Id",-1);
         createNotificationChannel();
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this,
                 0, notificationIntent, 0);
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Foreground Service")
-                .setContentText(input)
                 .setContentIntent(pendingIntent)
                 .build();
         startForeground(1, notification);
         //do heavy work on a background thread
         //stopSelf();
 
+        Log.d("Id from service", ""+id);
         startWorkers();
         return START_NOT_STICKY;
     }
@@ -76,8 +80,9 @@ public class ForegroundService extends Service {
 
     @Nullable
     @Override
-    public IBinder onBind(Intent intent) {
-        return null;
+    public IBinder onBind(Intent intent)
+    {
+        return binder;
     }
 
     private void createNotificationChannel() {
@@ -105,13 +110,21 @@ public class ForegroundService extends Service {
         getApplicationContext().registerReceiver(scannerWorker.wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         getApplicationContext().registerReceiver(scannerWorker.bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
-        PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://www.iotrelationshipfyp.com")
+        PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://www.scan.iotrelationshipfyp.com")
                 .create(IScanServiceClient.class),new UserIdentity(0));
 
-       // new Thread(pusherWorker).start();
-       // new Thread(scannerWorker).start();
+        new Thread(pusherWorker).start();
+        new Thread(scannerWorker).start();
         new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
                 .create(ISettingServiceClient.class), new ConfigProvider())).start();
+    }
+
+
+    public class LocalBinder extends Binder
+    {
+        ForegroundService getService() {
+            return ForegroundService.this;
+        }
     }
 
 

@@ -16,12 +16,16 @@ public class Config
 
     public static final ISetting<Integer> ScanningTime;
 
+
+    public static final ISetting<Integer> SettingSleepTime;
+
     static
     {
         ScannerSleepTime = new Setting<Integer>("ScannerSleepTime", 1000);
-        PusherSleepTime = new Setting<Integer>("PusherSleepTimeSetting", 16000);
+        PusherSleepTime = new Setting<Integer>("PusherSleepTimeSetting", 30000);
         PusherBatchSize = new Setting<Integer>("PusherBatchSizeSetting", 5);
         ScanningTime = new Setting<>("ScanningTimeSetting", 3000);
+        SettingSleepTime = new Setting<>("SettingSleepTime", 20000);
     }
 
 

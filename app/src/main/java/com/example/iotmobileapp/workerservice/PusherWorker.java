@@ -1,20 +1,14 @@
 package com.example.iotmobileapp.workerservice;
 
-import android.content.Context;
-import android.util.Log;
 
+import android.util.Log;
 import com.example.iotmobileapp.config.Config;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
 import com.example.iotmobileapp.workerservice.Definitions.ScanBatch;
 import com.example.iotmobileapp.workerservice.identity.IIdentity;
 import com.example.iotmobileapp.workerservice.serviceclient.IScanServiceClient;
-import com.google.gson.Gson;
-
-import java.io.IOException;
 import java.util.List;
-
-import okio.BufferedSink;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;

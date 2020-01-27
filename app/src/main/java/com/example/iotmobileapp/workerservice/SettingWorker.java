@@ -31,16 +31,11 @@ public class SettingWorker implements Runnable
     {
         while(true)
         {
-            Log.d("Setting Value: ", "" +Config.PusherBatchSize.Value());
-            Log.d("Setting Value: ", "" +Config.PusherSleepTime.Value());
-            Log.d("Setting Value: ", "" +Config.ScannerSleepTime.Value());
-            Log.d("Setting Value: ", "" +Config.ScanningTime.Value());
-
             Call<Configuration> call = m_serviceClient.GetCurrentConfig();
             call.enqueue(configurationCallback);
 
             try {
-                Thread.sleep(4000);
+                Thread.sleep(Config.SettingSleepTime.Value());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -56,6 +51,7 @@ public class SettingWorker implements Runnable
             {
                 Configuration config = response.body();
                 m_configProvider.UpdateConfig(config);
+                Log.d("Current Config Id", "" +config.Id);
             }
         }
 
