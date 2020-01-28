@@ -2,11 +2,16 @@ package com.example.iotmobileapp;
 
 import android.content.ServiceConnection;
 
+import com.example.iotmobileapp.config.Setting;
 import com.example.iotmobileapp.workerservice.Definitions.Configuration;
+
+import java.util.Collection;
 
 public interface IForegroundServiceConnection extends ServiceConnection
 {
-    void updateConfiguration(Configuration config);
+    void updateConfiguration(Collection<Setting> config);
 
-    Configuration getCurrentConfiguration();
+    Collection<Setting> getCurrentConfiguration();
+
+    boolean isConnected();
 }

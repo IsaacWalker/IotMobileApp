@@ -5,7 +5,9 @@ import android.util.Log;
 import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.Definitions.SettingModel;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class ConfigProvider implements IConfigProvider
 {
@@ -52,6 +54,12 @@ public class ConfigProvider implements IConfigProvider
                 _currentConfigId = config.Id;
             }
         }
+    }
+
+
+    @Override
+    public Collection<Setting> getConfig() {
+        return m_settingMap.values();
     }
 
     private Object parseValue(String type, String value)

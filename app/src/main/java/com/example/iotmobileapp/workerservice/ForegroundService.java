@@ -31,8 +31,10 @@ import androidx.core.app.NotificationCompat;
 import com.example.iotmobileapp.MainActivity;
 import com.example.iotmobileapp.config.Config;
 import com.example.iotmobileapp.config.ConfigProvider;
+import com.example.iotmobileapp.config.Setting;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Database.SharedDatabase;
+import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
 import com.example.iotmobileapp.workerservice.identity.UserIdentity;
 import com.example.iotmobileapp.workerservice.serviceclient.APIClient;
@@ -41,10 +43,18 @@ import com.example.iotmobileapp.workerservice.serviceclient.ISettingServiceClien
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.Collection;
+
 public class ForegroundService extends Service {
+
+
     public static final String CHANNEL_ID = "ForegroundServiceChannel";
 
+
     private final IBinder binder = new LocalBinder();
+
+
+    private final ConfigProvider m_configProvider = new ConfigProvider();
 
 
     @Override
@@ -113,19 +123,28 @@ public class ForegroundService extends Service {
         PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://www.scan.iotrelationshipfyp.com")
                 .create(IScanServiceClient.class),new UserIdentity(0));
 
-        new Thread(pusherWorker).start();
-        new Thread(scannerWorker).start();
-        new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
-                .create(ISettingServiceClient.class), new ConfigProvider())).start();
+     //   new Thread(pusherWorker).start();
+       // new Thread(scannerWorker).start();
+        //new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
+          //      .create(ISettingServiceClient.class), m_configProvider)).start();
     }
 
 
     public class LocalBinder extends Binder
     {
-        ForegroundService getService() {
+        public ForegroundService getService() {
             return ForegroundService.this;
         }
     }
+
+
+    public Collection<Setting> getConfig()
+    {
+        return m_configProvider.getConfig();
+    }
+
+
+
 
 
 }

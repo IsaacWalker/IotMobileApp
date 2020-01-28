@@ -18,11 +18,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.iotmobileapp.config.Setting;
 import com.example.iotmobileapp.device.Device;
 import com.example.iotmobileapp.device.IDevice;
 import com.example.iotmobileapp.device.IDeviceServiceClient;
 import com.example.iotmobileapp.workerservice.ForegroundService;
 import com.example.iotmobileapp.workerservice.serviceclient.APIClient;
+
+import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         m_device = new Device(
                 (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE),
                 BluetoothAdapter.getDefaultAdapter(),
-                APIClient.getClient("http://www.device.iotrelationshipfyp.com").create(IDeviceServiceClient.class)
+                APIClient.getClient("http://www.device.iotrelationshipfyp.com")
+                        .create(IDeviceServiceClient.class)
         );
 
         startServiceBtn = findViewById(R.id.startServiceBtn);
@@ -56,9 +60,9 @@ public class MainActivity extends AppCompatActivity {
                         locationRequestCode);
 
         }
-
-        m_device.TryRegister();
+        bindBtn.setOnClickListener(BindServiceListener);
     }
+
 
     private View.OnClickListener StartServiceListener = new View.OnClickListener()
     {
@@ -68,6 +72,16 @@ public class MainActivity extends AppCompatActivity {
             Log.d("Started Service", "started");
         }
     };
+
+
+    private View.OnClickListener BindServiceListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(MainActivity.this, ConfigurationActivity.class);
+            startActivity(intent);
+        }
+    };
+
 
     public void startService()
     {
