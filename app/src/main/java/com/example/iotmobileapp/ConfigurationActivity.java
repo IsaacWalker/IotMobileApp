@@ -1,12 +1,17 @@
 package com.example.iotmobileapp;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -47,6 +52,8 @@ public class ConfigurationActivity extends AppCompatActivity {
         mAdapter = new ConfigurationAdapter();
         recyclerView.setAdapter(mAdapter);
         swipeRefreshLayout.setOnRefreshListener(refreshListener);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
     }
 
 
@@ -57,8 +64,7 @@ public class ConfigurationActivity extends AppCompatActivity {
 
         public ConfigurationAdapter()
         {
-            settings = new Setting[1];
-            settings[0] = new Setting("Setting",34);
+            settings=new Setting[0];
         }
 
         @NonNull
@@ -66,12 +72,27 @@ public class ConfigurationActivity extends AppCompatActivity {
         public SettingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.configuration_list_row, parent, false);
+
             return new SettingViewHolder(v);
         }
 
         @Override
         public void onBindViewHolder(SettingViewHolder holder, int position) {
-            holder.textView.setText(settings[position].Name());
+
+            final String name = settings[position].Name();
+            final String value = settings[position].Value().toString();
+
+            holder.nameView.setText(name);
+            holder.valueView.setText(value);
+            holder.itemView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view) {
+                    DialogFragment newFragment = new EditSettingDialog(name);
+
+                    newFragment.show(getSupportFragmentManager(), "missiles");
+                }
+            });
         }
 
         @Override
@@ -81,10 +102,12 @@ public class ConfigurationActivity extends AppCompatActivity {
 
         public class SettingViewHolder extends RecyclerView.ViewHolder {
             // each data item is just a string in this case
-            public TextView textView;
+            public TextView nameView;
+            public TextView valueView;
             public SettingViewHolder(View v) {
                 super(v);
-                textView = v.findViewById(R.id.setting_name);
+                nameView = v.findViewById(R.id.setting_name);
+                valueView = v.findViewById(R.id.setting_value);
             }
         }
     }
@@ -98,10 +121,15 @@ public class ConfigurationActivity extends AppCompatActivity {
 
                 mAdapter.settings = settings;
                 if(settings.length > 0)
-                    mAdapter.notifyItemRangeChanged(0, settings.length-1);
-                Log.d("Settings Length", " " + settings.length);
+                {
+                    mAdapter.notifyDataSetChanged();
+                }
+
                 swipeRefreshLayout.setRefreshing(false);
             }
         }
     };
+
+
+
 }
