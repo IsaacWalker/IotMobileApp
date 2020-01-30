@@ -144,6 +144,13 @@ public class ForegroundService extends Service {
     }
 
 
+    public void setCurrentConfiguration(Collection<Setting> config)
+    {
+        m_configProvider.
+    }
+
+
+
 
 
 

@@ -6,18 +6,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.iotmobileapp.config.Setting;
+
 public class EditSettingDialog extends DialogFragment
 {
-    TextView nameView;
-    String name;
-    public EditSettingDialog(String name)
+    TextView nameView, typeView;
+    EditText valueView;
+    Setting setting;
+    public EditSettingDialog(Setting setting)
     {
-        this.name = name;
+        this.setting = setting;
     }
 
     @Override
@@ -27,14 +31,24 @@ public class EditSettingDialog extends DialogFragment
                 .setTitle("Name");
 
         LayoutInflater inflater = requireActivity().getLayoutInflater();
-        View v =inflater.inflate(R.layout.dialog_edit_setting, null);
+        View v = inflater.inflate(R.layout.dialog_edit_setting, null);
+
         nameView = v.findViewById(R.id.dialog_name);
-        nameView.setText(name);
+        typeView = v.findViewById(R.id.dialog_type);
+        valueView = v.findViewById(R.id.dialog_value);
+
+        nameView.setText(setting.Name());
+        typeView.setText(setting.Type());
+        valueView.setText(setting.Value().toString());
+
         builder.setView(v)
                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        // sign in the user ...
+                        String newValue = valueView.getText()
+                                .toString();
+                        Setting.SettingType.parseValue(setting.Type(),newValue);
+                        setting.SetValue(newValue);
                     }
                 })
                 .setNegativeButton("cancel", new DialogInterface.OnClickListener() {

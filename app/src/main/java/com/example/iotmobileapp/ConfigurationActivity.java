@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.example.iotmobileapp.config.Setting;
@@ -34,6 +35,7 @@ public class ConfigurationActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private SwipeRefreshLayout swipeRefreshLayout;
     private IForegroundServiceConnection m_serviceConnection;
+    private Switch useCustomSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,7 @@ public class ConfigurationActivity extends AppCompatActivity {
                 ForegroundService.class), m_serviceConnection, Context.BIND_AUTO_CREATE);
 
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.configuration_swipe);
+        useCustomSettings = findViewById(R.id.use_custom_settings);
         recyclerView = (RecyclerView) findViewById(R.id.configuration_recycler);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -77,7 +80,7 @@ public class ConfigurationActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onBindViewHolder(SettingViewHolder holder, int position) {
+        public void onBindViewHolder(SettingViewHolder holder, final  int position) {
 
             final String name = settings[position].Name();
             final String value = settings[position].Value().toString();
@@ -88,9 +91,8 @@ public class ConfigurationActivity extends AppCompatActivity {
             {
                 @Override
                 public void onClick(View view) {
-                    DialogFragment newFragment = new EditSettingDialog(name);
-
-                    newFragment.show(getSupportFragmentManager(), "missiles");
+                    DialogFragment newFragment = new EditSettingDialog(settings[position]);
+                    newFragment.show(getSupportFragmentManager(), "configDialog");
                 }
             });
         }
@@ -101,7 +103,6 @@ public class ConfigurationActivity extends AppCompatActivity {
         }
 
         public class SettingViewHolder extends RecyclerView.ViewHolder {
-            // each data item is just a string in this case
             public TextView nameView;
             public TextView valueView;
             public SettingViewHolder(View v) {
@@ -117,7 +118,9 @@ public class ConfigurationActivity extends AppCompatActivity {
         public void onRefresh() {
             if(m_serviceConnection.isConnected())
             {
-                Setting[] settings = m_serviceConnection.getCurrentConfiguration().toArray(new Setting[0]);
+                Setting[] settings = m_serviceConnection
+                        .getCurrentConfiguration()
+                        .toArray(new Setting[0]);
 
                 mAdapter.settings = settings;
                 if(settings.length > 0)

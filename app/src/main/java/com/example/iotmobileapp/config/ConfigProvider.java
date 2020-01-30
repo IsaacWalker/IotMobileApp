@@ -38,6 +38,11 @@ public class ConfigProvider implements IConfigProvider
 
 
     @Override
+    public void UpdateConfig(Collection<Setting> config) {
+        for(Setting )
+    }
+
+    @Override
     public void UpdateConfig(Configuration config)
     {
         for(SettingModel settingModel : config.settings)
@@ -47,7 +52,7 @@ public class ConfigProvider implements IConfigProvider
 
                 Setting setting = m_settingMap.get(settingModel.name);
 
-                Object newValue = parseValue(settingModel.type, settingModel.value);
+                Object newValue = Setting.SettingType.parseValue(settingModel.type, settingModel.value);
 
                 setting.SetValue(newValue);
 
@@ -61,16 +66,4 @@ public class ConfigProvider implements IConfigProvider
     public Collection<Setting> getConfig() {
         return m_settingMap.values();
     }
-
-    private Object parseValue(String type, String value)
-    {
-        if(type.equals("System.Integer"))
-            return Integer.parseInt(value);
-        if(type.equals("System.Boolean"))
-            return Boolean.parseBoolean(value);
-        if(type.equals("System.Double"))
-            return Boolean.parseBoolean(value);
-        return value;
-    }
-
 }
