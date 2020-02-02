@@ -45,9 +45,9 @@ public class EditSettingDialog extends DialogFragment
                 .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int id) {
-                        String newValue = valueView.getText()
+                        String newValueString = valueView.getText()
                                 .toString();
-                        Setting.SettingType.parseValue(setting.Type(),newValue);
+                        Object newValue = Setting.SettingType.parseValue(setting.Type(),newValueString);
                         setting.SetValue(newValue);
                     }
                 })

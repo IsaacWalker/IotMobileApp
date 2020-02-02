@@ -19,6 +19,9 @@ public class Config
 
     public static final ISetting<Integer> SettingSleepTime;
 
+
+    public static final ISetting<Integer> MeetingFrequency;
+
     static
     {
         ScannerSleepTime = new Setting<Integer>("ScannerSleepTime", 1000);
@@ -26,6 +29,7 @@ public class Config
         PusherBatchSize = new Setting<Integer>("PusherBatchSizeSetting", 5);
         ScanningTime = new Setting<>("ScanningTimeSetting", 3000);
         SettingSleepTime = new Setting<>("SettingSleepTime", 20000);
+        MeetingFrequency = new Setting<>("MeetingFrequency", 3);
     }
 
 

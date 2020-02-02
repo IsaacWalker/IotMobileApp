@@ -5,19 +5,14 @@ import android.util.Log;
 import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.Definitions.SettingModel;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 public class ConfigProvider implements IConfigProvider
 {
-    private static final int UNDEFINED_CONFIG_ID = Integer.MIN_VALUE;
-
-
     private static HashMap<String, Setting> m_settingMap = new HashMap<>();
-
-
-    private int _currentConfigId = UNDEFINED_CONFIG_ID;
 
 
     public ConfigProvider()
@@ -37,11 +32,27 @@ public class ConfigProvider implements IConfigProvider
     }
 
 
-    @Override
-    public void UpdateConfig(Collection<Setting> config) {
-        for(Setting )
-    }
+    public static List<SettingModel> GetSettingModels()
+    {
+        Setting[] settings = m_settingMap.values().toArray(new Setting[0]);
 
+        ArrayList<SettingModel> settingModels = new ArrayList<>();
+
+        for(Setting s : settings)
+        {
+            SettingModel model = new SettingModel();
+            model.name = s.Name();
+            model.type = s.Type();
+            model.value = s.Value().toString();
+
+            settingModels.add(model);
+        }
+
+        return settingModels;
+     }
+
+
+    // Updating a global configuration
     @Override
     public void UpdateConfig(Configuration config)
     {
@@ -55,15 +66,26 @@ public class ConfigProvider implements IConfigProvider
                 Object newValue = Setting.SettingType.parseValue(settingModel.type, settingModel.value);
 
                 setting.SetValue(newValue);
-
-                _currentConfigId = config.Id;
             }
         }
     }
 
 
     @Override
+    public void updateSetting(ISetting setting, Object value) {
+        Setting settingObj = m_settingMap.get(setting.Name());
+        settingObj.SetValue(value);
+    }
+
+
+    @Override
     public Collection<Setting> getConfig() {
         return m_settingMap.values();
+    }
+
+
+    @Override
+    public int getGlobalConfigId(int localId) {
+        return 0;
     }
 }

@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.example.iotmobileapp.config.Setting;
 import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.ForegroundService;
+import com.google.android.gms.tasks.Task;
 
 import java.util.Collection;
 import java.util.List;
@@ -35,7 +36,6 @@ public class ConfigurationActivity extends AppCompatActivity {
     private RecyclerView.LayoutManager layoutManager;
     private SwipeRefreshLayout swipeRefreshLayout;
     private IForegroundServiceConnection m_serviceConnection;
-    private Switch useCustomSettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ public class ConfigurationActivity extends AppCompatActivity {
                 ForegroundService.class), m_serviceConnection, Context.BIND_AUTO_CREATE);
 
         swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.configuration_swipe);
-        useCustomSettings = findViewById(R.id.use_custom_settings);
+        //useCustomSettings = findViewById(R.id.use_custom_settings);
         recyclerView = (RecyclerView) findViewById(R.id.configuration_recycler);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);

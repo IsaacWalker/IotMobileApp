@@ -31,8 +31,9 @@ public class SettingWorker implements Runnable
     {
         while(true)
         {
-            Call<Configuration> call = m_serviceClient.GetCurrentConfig();
-            call.enqueue(configurationCallback);
+            Log.d("Setting Value", "Value: " + Config.MeetingFrequency.Value());
+            //Call<Configuration> call = m_serviceClient.GetCurrentConfig();
+           // call.enqueue(configurationCallback);
 
             try {
                 Thread.sleep(Config.SettingSleepTime.Value());

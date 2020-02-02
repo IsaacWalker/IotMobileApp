@@ -5,11 +5,14 @@ import java.util.Collection;
 
 public interface IConfigProvider
 {
-    void UpdateConfig(Collection<Setting> config);
-
     void UpdateConfig(Configuration config);
+
+
+    void updateSetting(ISetting setting, Object value);
+
 
     Collection<Setting> getConfig();
 
 
+    int getGlobalConfigId(int localId);
 }

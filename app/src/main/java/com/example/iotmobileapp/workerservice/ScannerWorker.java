@@ -22,6 +22,7 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.example.iotmobileapp.config.Config;
+import com.example.iotmobileapp.config.ConfigProvider;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Definitions.Kinematics;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
@@ -101,7 +102,10 @@ public class ScannerWorker implements Runnable
                 m_bluetoothAdapter.cancelDiscovery();
                 while(!_isWifiComplete){}
 
+                _scan.Configuration = ConfigProvider.GetSettingModels();
+
                 m_database.insert(_scan);
+
             }
 
             try

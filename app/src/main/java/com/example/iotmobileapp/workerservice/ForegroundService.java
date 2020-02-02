@@ -125,8 +125,8 @@ public class ForegroundService extends Service {
 
      //   new Thread(pusherWorker).start();
        // new Thread(scannerWorker).start();
-        //new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
-          //      .create(ISettingServiceClient.class), m_configProvider)).start();
+        new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
+               .create(ISettingServiceClient.class), m_configProvider)).start();
     }
 
 
@@ -143,11 +143,6 @@ public class ForegroundService extends Service {
         return m_configProvider.getConfig();
     }
 
-
-    public void setCurrentConfiguration(Collection<Setting> config)
-    {
-        m_configProvider.
-    }
 
 
 

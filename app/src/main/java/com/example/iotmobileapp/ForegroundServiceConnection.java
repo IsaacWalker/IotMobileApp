@@ -20,6 +20,16 @@ public class ForegroundServiceConnection implements IForegroundServiceConnection
 
     }
 
+    @Override
+    public void setUseRemoteConfiguration(boolean use) {
+
+    }
+
+    @Override
+    public boolean isUsingRemoteConfiguration() {
+        return false;
+    }
+
 
     @Override
     public Collection<Setting> getCurrentConfiguration() {
