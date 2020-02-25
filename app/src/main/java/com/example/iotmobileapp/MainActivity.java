@@ -61,6 +61,8 @@ public class MainActivity extends AppCompatActivity {
 
         }
         bindBtn.setOnClickListener(BindServiceListener);
+
+        m_device.TryRegister();
     }
 
 

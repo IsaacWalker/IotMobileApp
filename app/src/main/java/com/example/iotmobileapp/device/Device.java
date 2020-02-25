@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.net.MacAddress;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.util.Log;
+
 import java.net.NetworkInterface;
 import java.util.List;
 
@@ -70,6 +72,7 @@ public class Device implements IDevice
 
     @Override
     public void TryRegister() {
+        Log.d("Register Device", "Trying to register");
         DeviceModel model = new DeviceModel();
         model.BluetoothName = _bluetoothName;
         model.MacAddress = _macAddress;
@@ -117,6 +120,7 @@ public class Device implements IDevice
             {
                 _id = response.body();
                 _isRegistered = true;
+                Log.d("Register Device", "Register Successful with Id " + _id);
             }
         }
 
