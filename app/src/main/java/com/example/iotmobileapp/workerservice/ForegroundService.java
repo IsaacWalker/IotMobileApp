@@ -79,7 +79,7 @@ public class ForegroundService extends Service {
         //stopSelf();
 
         Log.d("Id from service", ""+id);
-        startWorkers();
+        startWorkers(id);
         return START_NOT_STICKY;
     }
 
@@ -108,7 +108,7 @@ public class ForegroundService extends Service {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-    private void startWorkers() {
+    private void startWorkers(int id) {
 
         WifiManager wifiManagerManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         BluetoothManager bluetoothManager = (BluetoothManager) getApplicationContext().getSystemService(Context.BLUETOOTH_SERVICE);
@@ -121,7 +121,7 @@ public class ForegroundService extends Service {
         //getApplicationContext().registerReceiver(scannerWorker.bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
         PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://www.scan.iotrelationshipfyp.com")
-                .create(IScanServiceClient.class),new UserIdentity(0));
+                .create(IScanServiceClient.class),new UserIdentity(id));
 
         new Thread(pusherWorker).start();
         new Thread(scannerWorker).start();
