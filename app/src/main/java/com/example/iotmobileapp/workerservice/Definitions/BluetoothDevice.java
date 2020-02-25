@@ -15,4 +15,10 @@ public class BluetoothDevice
 
     @SerializedName("address")
     public String Address;
+
+    @SerializedName("rssi")
+    public int Rssi;
+
+    @SerializedName("powerLevel")
+    public int PowerLevel;
 }

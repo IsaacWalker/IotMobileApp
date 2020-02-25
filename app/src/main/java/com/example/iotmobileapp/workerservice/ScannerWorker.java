@@ -3,13 +3,14 @@ package com.example.iotmobileapp.workerservice;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.ScanCallback;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -18,6 +19,7 @@ import android.location.Location;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 
@@ -63,6 +65,7 @@ public class ScannerWorker implements Runnable
         m_sensorManager = sensorManager;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @SuppressLint("MissingPermission")
     @Override
     public void run()
@@ -88,8 +91,10 @@ public class ScannerWorker implements Runnable
             _scan.bluetoothDevices= new ArrayList<com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice>();
             _isWifiComplete = false;
 
-            if(m_wifiManager.startScan() && m_bluetoothAdapter.startDiscovery())
+
+            if(m_wifiManager.startScan() && m_bluetoothAdapter.getBluetoothLeScanner() != null)
             {
+                m_bluetoothAdapter.getBluetoothLeScanner().startScan(bleScanCallback);
                 Task<Location> locTask = m_locationClient.getLastLocation();
                 locTask.addOnSuccessListener(locationListener);
 
@@ -102,7 +107,16 @@ public class ScannerWorker implements Runnable
                 m_bluetoothAdapter.cancelDiscovery();
                 while(!_isWifiComplete){}
 
-                _scan.Configuration = ConfigProvider.GetSettingModels();
+
+                if(ConfigProvider.isGlobalConfigActive())
+                {
+                    _scan.GlobalConfigurationId = ConfigProvider.getGlobalConfigId();
+                    _scan.LocalConfiguration = null;
+                }
+                else
+                {
+                    _scan.LocalConfiguration = ConfigProvider.GetSettingModels();
+                }
 
                 m_database.insert(_scan);
 
@@ -140,26 +154,6 @@ public class ScannerWorker implements Runnable
 
             _scan.wifiDevices = wifiScans;
             _isWifiComplete = true;
-        }
-    };
-
-    BroadcastReceiver bluetoothReceiver = new BroadcastReceiver() {
-        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice bluetoothDevice
-                        = new com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice();
-                bluetoothDevice.Timestamp = System.currentTimeMillis();
-                bluetoothDevice.Name = device.getName();
-                bluetoothDevice.Type = "Type";
-                bluetoothDevice.Address = device.getAddress();
-
-                _scan.bluetoothDevices.add(bluetoothDevice);
-            }
         }
     };
 
@@ -210,7 +204,34 @@ public class ScannerWorker implements Runnable
     }
     };
 
+    @TargetApi(21)
+    ScanCallback bleScanCallback = new ScanCallback() {
+        @Override
+        public void onScanResult(int callbackType, android.bluetooth.le.ScanResult result) {
+            super.onScanResult(callbackType, result);
 
+            com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice bluetoothDevice
+                    = new com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice();
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                bluetoothDevice.Name = result.getDevice().getName();
+                bluetoothDevice.Address = result.getDevice().getAddress();
+                bluetoothDevice.Type = BluetoothDeviceType.getString(result.getDevice().getType());
+                bluetoothDevice.Timestamp = System.currentTimeMillis();
+                bluetoothDevice.PowerLevel = result.getScanRecord().getTxPowerLevel();
+                bluetoothDevice.Rssi = result.getRssi();
+
+                Log.d("BLE", "Name " + bluetoothDevice.Name);
+                Log.d("BLE", "Address " + bluetoothDevice.Address);
+                Log.d("BLE", "Type " + bluetoothDevice.Type);
+                Log.d("BLE", "Timestamp " + bluetoothDevice.Timestamp);
+                Log.d("BLE", "PowerLevel " + bluetoothDevice.PowerLevel);
+                Log.d("BLE", "Rssi " + bluetoothDevice.Rssi);
+                _scan.bluetoothDevices.add(bluetoothDevice);
+            }
+
+        }
+    };
 
 
 }

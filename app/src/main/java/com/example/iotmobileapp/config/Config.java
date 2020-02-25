@@ -24,10 +24,10 @@ public class Config
 
     static
     {
-        ScannerSleepTime = new Setting<Integer>("ScannerSleepTime", 1000);
-        PusherSleepTime = new Setting<Integer>("PusherSleepTimeSetting", 30000);
-        PusherBatchSize = new Setting<Integer>("PusherBatchSizeSetting", 5);
-        ScanningTime = new Setting<>("ScanningTimeSetting", 3000);
+        ScannerSleepTime = new Setting<Integer>("ScannerSleepTime", 4000);
+        PusherSleepTime = new Setting<Integer>("PusherSleepTime",  10000);
+        PusherBatchSize = new Setting<Integer>("PusherBatchSize", 5);
+        ScanningTime = new Setting<>("ScanningTime", 3000);
         SettingSleepTime = new Setting<>("SettingSleepTime", 20000);
         MeetingFrequency = new Setting<>("MeetingFrequency", 3);
     }

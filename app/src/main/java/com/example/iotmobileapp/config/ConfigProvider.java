@@ -15,6 +15,15 @@ public class ConfigProvider implements IConfigProvider
     private static HashMap<String, Setting> m_settingMap = new HashMap<>();
 
 
+    private static final int LOCAL_CONFIG_ID = -1;
+
+
+    private static int CurrentGlobalConfigId = LOCAL_CONFIG_ID;
+
+
+    private static boolean _useGlobalConfig = true;
+
+
     public ConfigProvider()
     {
         try {
@@ -60,7 +69,6 @@ public class ConfigProvider implements IConfigProvider
         {
             if(m_settingMap.containsKey(settingModel.name))
             {
-
                 Setting setting = m_settingMap.get(settingModel.name);
 
                 Object newValue = Setting.SettingType.parseValue(settingModel.type, settingModel.value);
@@ -68,10 +76,11 @@ public class ConfigProvider implements IConfigProvider
                 setting.SetValue(newValue);
             }
         }
+
+        CurrentGlobalConfigId = config.Id;
     }
 
 
-    @Override
     public void updateSetting(ISetting setting, Object value) {
         Setting settingObj = m_settingMap.get(setting.Name());
         settingObj.SetValue(value);
@@ -84,8 +93,24 @@ public class ConfigProvider implements IConfigProvider
     }
 
 
-    @Override
-    public int getGlobalConfigId(int localId) {
-        return 0;
+    public static int getGlobalConfigId() {
+        return CurrentGlobalConfigId;
+    }
+
+
+    public static boolean isGlobalConfigEnabled()
+    {
+        return _useGlobalConfig;
+    }
+
+    public static boolean isGlobalConfigActive()
+    {
+        return CurrentGlobalConfigId != LOCAL_CONFIG_ID;
+    }
+
+
+    public static void setGlobalConfig(boolean enable)
+    {
+        _useGlobalConfig = enable;
     }
 }

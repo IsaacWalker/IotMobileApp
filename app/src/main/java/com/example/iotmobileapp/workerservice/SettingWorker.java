@@ -3,6 +3,7 @@ package com.example.iotmobileapp.workerservice;
 import android.util.Log;
 
 import com.example.iotmobileapp.config.Config;
+import com.example.iotmobileapp.config.ConfigProvider;
 import com.example.iotmobileapp.config.IConfigProvider;
 import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.serviceclient.ISettingServiceClient;
@@ -31,9 +32,11 @@ public class SettingWorker implements Runnable
     {
         while(true)
         {
-            Log.d("Setting Value", "Value: " + Config.MeetingFrequency.Value());
-            //Call<Configuration> call = m_serviceClient.GetCurrentConfig();
-           // call.enqueue(configurationCallback);
+            if(ConfigProvider.isGlobalConfigEnabled())
+            {
+                Call<Configuration> call = m_serviceClient.GetCurrentConfig();
+                call.enqueue(configurationCallback);
+            }
 
             try {
                 Thread.sleep(Config.SettingSleepTime.Value());

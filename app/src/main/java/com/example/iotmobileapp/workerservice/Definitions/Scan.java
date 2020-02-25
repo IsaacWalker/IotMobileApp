@@ -10,8 +10,11 @@ public class Scan
     @SerializedName("timestamp")
     public long Timestamp = System.currentTimeMillis();
 
+    @SerializedName("globalConfigurationId")
+    public int GlobalConfigurationId;
+
     @SerializedName("configuration")
-    public List<SettingModel> Configuration;
+    public List<SettingModel> LocalConfiguration;
 
     @SerializedName("kinematics")
     public Kinematics kinematics;

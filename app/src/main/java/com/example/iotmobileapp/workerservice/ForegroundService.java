@@ -118,15 +118,15 @@ public class ForegroundService extends Service {
 
         ScannerWorker scannerWorker = new ScannerWorker(scanDatabase, wifiManagerManager, bluetoothManager, locationProviderClient, sensorManager);
         getApplicationContext().registerReceiver(scannerWorker.wifiReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-        getApplicationContext().registerReceiver(scannerWorker.bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
+        //getApplicationContext().registerReceiver(scannerWorker.bluetoothReceiver, new IntentFilter(BluetoothDevice.ACTION_FOUND));
 
         PusherWorker pusherWorker = new PusherWorker(scanDatabase, APIClient.getClient("http://www.scan.iotrelationshipfyp.com")
                 .create(IScanServiceClient.class),new UserIdentity(0));
 
-     //   new Thread(pusherWorker).start();
-       // new Thread(scannerWorker).start();
-        new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
-               .create(ISettingServiceClient.class), m_configProvider)).start();
+        new Thread(pusherWorker).start();
+        new Thread(scannerWorker).start();
+       // new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
+       //        .create(ISettingServiceClient.class), m_configProvider)).start();
     }
 
 
