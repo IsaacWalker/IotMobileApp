@@ -8,6 +8,8 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanFilter;
+import android.bluetooth.le.ScanSettings;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -91,7 +93,6 @@ public class ScannerWorker implements Runnable
             _scan.bluetoothDevices= new ArrayList<com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice>();
             _isWifiComplete = false;
 
-
             if(m_wifiManager.startScan() && m_bluetoothAdapter.getBluetoothLeScanner() != null)
             {
                 m_bluetoothAdapter.getBluetoothLeScanner().startScan(bleScanCallback);
@@ -104,7 +105,7 @@ public class ScannerWorker implements Runnable
                     e.printStackTrace();
                 }
 
-                m_bluetoothAdapter.cancelDiscovery();
+                m_bluetoothAdapter.getBluetoothLeScanner().stopScan(bleScanCallback);
                 while(!_isWifiComplete){}
 
 
@@ -214,24 +215,39 @@ public class ScannerWorker implements Runnable
                     = new com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice();
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                bluetoothDevice.Name = result.getDevice().getName();
-                bluetoothDevice.Address = result.getDevice().getAddress();
-                bluetoothDevice.Type = BluetoothDeviceType.getString(result.getDevice().getType());
-                bluetoothDevice.Timestamp = System.currentTimeMillis();
-                bluetoothDevice.PowerLevel = result.getScanRecord().getTxPowerLevel();
-                bluetoothDevice.Rssi = result.getRssi();
 
-                Log.d("BLE", "Name " + bluetoothDevice.Name);
-                Log.d("BLE", "Address " + bluetoothDevice.Address);
-                Log.d("BLE", "Type " + bluetoothDevice.Type);
-                Log.d("BLE", "Timestamp " + bluetoothDevice.Timestamp);
-                Log.d("BLE", "PowerLevel " + bluetoothDevice.PowerLevel);
-                Log.d("BLE", "Rssi " + bluetoothDevice.Rssi);
-                _scan.bluetoothDevices.add(bluetoothDevice);
+                String address = result.getDevice().getAddress();
+
+                if(!isBleDevicePresent(address))
+                {
+                    Log.d("BLE ", "Device Found");
+
+                    bluetoothDevice.Name = result.getDevice().getName();
+                    bluetoothDevice.Address = address;
+                    bluetoothDevice.Type = BluetoothDeviceType.getString(result.getDevice().getType());
+                    bluetoothDevice.Timestamp = System.currentTimeMillis();
+                    bluetoothDevice.PowerLevel = result.getScanRecord().getTxPowerLevel();
+                    bluetoothDevice.Rssi = result.getRssi();
+
+                    _scan.bluetoothDevices.add(bluetoothDevice);
+                }
             }
 
         }
     };
+
+    private boolean isBleDevicePresent(String address)
+    {
+
+        for(com.example.iotmobileapp.workerservice.Definitions.BluetoothDevice d : _scan.bluetoothDevices)
+        {
+            if(d.Address.equals(address))
+                return true;
+        }
+
+        return false;
+    }
+
 
 
 }
