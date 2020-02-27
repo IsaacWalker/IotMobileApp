@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class Kinematics
 {
-    @SerializedName("datetime")
+    @SerializedName("dateTime")
     public Date DateTime;
 
     // GPS position

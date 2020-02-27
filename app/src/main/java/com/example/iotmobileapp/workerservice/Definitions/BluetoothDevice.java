@@ -6,7 +6,7 @@ import java.util.Date;
 
 public class BluetoothDevice
 {
-    @SerializedName("datetime")
+    @SerializedName("dateTime")
     public Date DateTime;
 
     @SerializedName("name")

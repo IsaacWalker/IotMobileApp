@@ -57,13 +57,12 @@ public class PusherWorker implements Runnable
         @Override
         public void onResponse(Call<Void> call, Response<Void> response) {
 
-            Log.d("Success", "Log inserted" + response.code());
+            Log.d("Success", "Log inserted" + response.raw().toString());
             if(response.code() != 400)
             {
 
             }
         }
-
         @Override
         public void onFailure(Call call, Throwable t) {
 
