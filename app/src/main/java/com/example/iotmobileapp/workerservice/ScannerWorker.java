@@ -143,7 +143,7 @@ public class ScannerWorker implements Runnable
             for (ScanResult scanResult : scanResults)
             {
                 WifiDevice wifiDevice= new WifiDevice();
-                wifiDevice.Timestamp = scanResult.timestamp;
+                wifiDevice.DateTime = Utilities.GetCurrentDateTime();
                 wifiDevice.SSID = scanResult.SSID;
                 wifiDevice.BSSID = scanResult.BSSID;
                 wifiDevice.capabilities = scanResult.capabilities;
@@ -197,7 +197,7 @@ public class ScannerWorker implements Runnable
     {
         if(location!=null)
         {
-            _scan.kinematics.timestamp = location.getTime();
+            _scan.kinematics.DateTime = Utilities.GetCurrentDateTime();
             _scan.kinematics.altitude = location.getAltitude();
             _scan.kinematics.latitude = location.getLatitude();
             _scan.kinematics.longitude = location.getLongitude();
@@ -225,7 +225,7 @@ public class ScannerWorker implements Runnable
                     bluetoothDevice.Name = result.getDevice().getName();
                     bluetoothDevice.Address = address;
                     bluetoothDevice.Type = BluetoothDeviceType.getString(result.getDevice().getType());
-                    bluetoothDevice.Timestamp = System.currentTimeMillis();
+                    bluetoothDevice.DateTime = Utilities.GetCurrentDateTime();
                     bluetoothDevice.PowerLevel = result.getScanRecord().getTxPowerLevel();
                     bluetoothDevice.Rssi = result.getRssi();
 

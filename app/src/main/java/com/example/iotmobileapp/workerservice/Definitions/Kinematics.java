@@ -2,10 +2,12 @@ package com.example.iotmobileapp.workerservice.Definitions;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 public class Kinematics
 {
-    @SerializedName("timestamp")
-    public long timestamp;
+    @SerializedName("datetime")
+    public Date DateTime;
 
     // GPS position
     @SerializedName("altitude")

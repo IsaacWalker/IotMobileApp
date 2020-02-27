@@ -3,12 +3,14 @@ package com.example.iotmobileapp.workerservice.Definitions;
 import com.example.iotmobileapp.config.Setting;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class Scan
 {
-    @SerializedName("timestamp")
-    public long Timestamp = System.currentTimeMillis();
+    @SerializedName("datetime")
+    public Date DateTime = Calendar.getInstance().getTime();
 
     @SerializedName("globalConfigurationId")
     public int GlobalConfigurationId;

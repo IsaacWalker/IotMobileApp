@@ -2,10 +2,12 @@ package com.example.iotmobileapp.workerservice.Definitions;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.Date;
+
 public class BluetoothDevice
 {
-    @SerializedName("timestamp")
-    public long Timestamp;
+    @SerializedName("datetime")
+    public Date DateTime;
 
     @SerializedName("name")
     public String Name;
