@@ -14,6 +14,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,8 +60,22 @@ public class ConfigurationActivity extends AppCompatActivity {
         swipeRefreshLayout.setOnRefreshListener(refreshListener);
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL);
         recyclerView.addItemDecoration(dividerItemDecoration);
+        Handler handler = new Handler(Looper.getMainLooper())
+        {
+            @Override
+            public void handleMessage(Message inputMessage) {
+
+            }
+        };
+
+        new Thread(new UpdateDisplayThread()).start();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(m_serviceConnection);
+    }
 
     private class ConfigurationAdapter extends RecyclerView.Adapter<ConfigurationAdapter.SettingViewHolder>
     {
@@ -93,6 +110,7 @@ public class ConfigurationActivity extends AppCompatActivity {
                 public void onClick(View view) {
                     DialogFragment newFragment = new EditSettingDialog(settings[position]);
                     newFragment.show(getSupportFragmentManager(), "configDialog");
+                    m_serviceConnection.setUseRemoteConfiguration(false);
                 }
             });
         }
@@ -116,23 +134,34 @@ public class ConfigurationActivity extends AppCompatActivity {
     private SwipeRefreshLayout.OnRefreshListener refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
         @Override
         public void onRefresh() {
-            if(m_serviceConnection.isConnected())
-            {
-                Setting[] settings = m_serviceConnection
-                        .getCurrentConfiguration()
-                        .toArray(new Setting[0]);
-
-                mAdapter.settings = settings;
-                if(settings.length > 0)
-                {
-                    mAdapter.notifyDataSetChanged();
-                }
-
-                swipeRefreshLayout.setRefreshing(false);
-            }
+            swipeRefreshLayout.setRefreshing(false);
+            mAdapter.notifyDataSetChanged();
         }
     };
 
 
+    private class UpdateDisplayThread implements Runnable
+    {
+        @Override
+        public void run() {
+            try {
+                Thread.sleep(100);
+                updateSettingsDisplayData();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
+    private void updateSettingsDisplayData()
+    {
+        if(m_serviceConnection != null && m_serviceConnection.isConnected())
+        {
+                Setting[] settings = m_serviceConnection
+                .getCurrentConfiguration()
+                .toArray(new Setting[0]);
+                mAdapter.settings = settings;
+        }
+
+    }
 }

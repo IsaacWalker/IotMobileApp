@@ -25,7 +25,7 @@ public class Config
     static
     {
         ScannerSleepTime = new Setting<Integer>("ScannerSleepTime", 4000);
-        PusherSleepTime = new Setting<Integer>("PusherSleepTime",  10000);
+        PusherSleepTime = new Setting<Integer>("PusherSleepTime",  1000);
         PusherBatchSize = new Setting<Integer>("PusherBatchSize", 5);
         ScanningTime = new Setting<>("ScanningTime", 3000);
         SettingSleepTime = new Setting<>("SettingSleepTime", 20000);

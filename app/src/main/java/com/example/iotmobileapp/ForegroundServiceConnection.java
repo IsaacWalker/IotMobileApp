@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.os.IBinder;
 import android.util.Log;
 
+import com.example.iotmobileapp.config.ConfigProvider;
 import com.example.iotmobileapp.config.Setting;
 import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.ForegroundService;
@@ -22,7 +23,7 @@ public class ForegroundServiceConnection implements IForegroundServiceConnection
 
     @Override
     public void setUseRemoteConfiguration(boolean use) {
-
+        ConfigProvider.setGlobalConfig(use);
     }
 
     @Override

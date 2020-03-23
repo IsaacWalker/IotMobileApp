@@ -1,4 +1,4 @@
-package com.example.iotmobileapp.workerservice.serviceclient;
+package com.example.iotmobileapp;
 
 import com.example.iotmobileapp.workerservice.Utilities;
 import com.google.gson.Gson;

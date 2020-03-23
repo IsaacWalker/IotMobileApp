@@ -1,22 +1,15 @@
 package com.example.iotmobileapp.workerservice;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.hardware.Sensor;
 import android.hardware.SensorManager;
-import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Binder;
 import android.os.Build;
@@ -25,19 +18,16 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 
 import com.example.iotmobileapp.MainActivity;
-import com.example.iotmobileapp.config.Config;
 import com.example.iotmobileapp.config.ConfigProvider;
 import com.example.iotmobileapp.config.Setting;
 import com.example.iotmobileapp.workerservice.Database.ISharedDatabase;
 import com.example.iotmobileapp.workerservice.Database.SharedDatabase;
-import com.example.iotmobileapp.workerservice.Definitions.Configuration;
 import com.example.iotmobileapp.workerservice.Definitions.Scan;
 import com.example.iotmobileapp.workerservice.identity.UserIdentity;
-import com.example.iotmobileapp.workerservice.serviceclient.APIClient;
+import com.example.iotmobileapp.APIClient;
 import com.example.iotmobileapp.workerservice.serviceclient.IScanServiceClient;
 import com.example.iotmobileapp.workerservice.serviceclient.ISettingServiceClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -54,7 +44,7 @@ public class ForegroundService extends Service {
     private final IBinder binder = new LocalBinder();
 
 
-    private final ConfigProvider m_configProvider = new ConfigProvider();
+    public final ConfigProvider m_configProvider = new ConfigProvider();
 
 
     @Override
@@ -125,8 +115,8 @@ public class ForegroundService extends Service {
 
         new Thread(pusherWorker).start();
         new Thread(scannerWorker).start();
-       // new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
-       //        .create(ISettingServiceClient.class), m_configProvider)).start();
+        new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
+               .create(ISettingServiceClient.class), m_configProvider)).start();
     }
 
 

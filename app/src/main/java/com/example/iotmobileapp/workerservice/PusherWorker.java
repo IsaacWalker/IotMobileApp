@@ -34,8 +34,8 @@ public class PusherWorker implements Runnable
     {
         while(true)
         {
-            List<Scan> scans = m_scanDatabase.take(Config.PusherBatchSize.Value());
 
+            List<Scan> scans = m_scanDatabase.take(Config.PusherBatchSize.Value());
             if(scans != null && scans.size() > 0)
             {
                 ScanBatch batch = new ScanBatch(m_userIdentity.GetDeviceId(), scans);
