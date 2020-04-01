@@ -115,8 +115,8 @@ public class ForegroundService extends Service {
 
         new Thread(pusherWorker).start();
         new Thread(scannerWorker).start();
-        new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
-               .create(ISettingServiceClient.class), m_configProvider)).start();
+        //new Thread(new SettingWorker(APIClient.getClient("http://www.setting.iotrelationshipfyp.com")
+            //   .create(ISettingServiceClient.class), m_configProvider)).start();
     }
 
 

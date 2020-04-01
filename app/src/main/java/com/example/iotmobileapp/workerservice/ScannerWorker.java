@@ -100,7 +100,7 @@ public class ScannerWorker implements Runnable
                 locTask.addOnSuccessListener(locationListener);
 
                 try {
-                    Thread.sleep(Config.ScanningTime.Value());
+                    Thread.sleep(Config.ScanDuration.Value());
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -125,7 +125,7 @@ public class ScannerWorker implements Runnable
 
             try
             {
-                Thread.sleep(Config.ScannerSleepTime.Value());
+                Thread.sleep(Config.ScannerSleepDuration.Value());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

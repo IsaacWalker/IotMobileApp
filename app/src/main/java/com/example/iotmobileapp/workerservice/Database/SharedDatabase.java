@@ -33,4 +33,9 @@ public class SharedDatabase<T> implements ISharedDatabase<T>
 
         return list;
     }
+
+    @Override
+    public int count() {
+        return m_stack.size();
+    }
 }

@@ -39,7 +39,7 @@ public class SettingWorker implements Runnable
             }
 
             try {
-                Thread.sleep(Config.SettingSleepTime.Value());
+                Thread.sleep(Config.SettingSleepDuration.Value());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

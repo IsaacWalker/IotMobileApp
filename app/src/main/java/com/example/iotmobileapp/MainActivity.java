@@ -5,11 +5,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,6 +21,8 @@ import com.example.iotmobileapp.device.Device;
 import com.example.iotmobileapp.device.IDevice;
 import com.example.iotmobileapp.device.IDeviceServiceClient;
 import com.example.iotmobileapp.gdpr.PrivacyActivity;
+import com.example.iotmobileapp.security.GatewayTokenService;
+import com.example.iotmobileapp.security.IGatewayTokenService;
 import com.example.iotmobileapp.workerservice.ForegroundService;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private Button startServiceBtn, bindBtn, privacyBtn;
     private IDevice m_device;
 
+
+    @SuppressLint("NewApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,9 +90,13 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener PrivacyButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(MainActivity.this, PrivacyActivity.class);
-            intent.putExtra("Id", m_device.GetId());
-            startActivity(intent);
+
+            IGatewayTokenService gatewayTokenService = new GatewayTokenService(
+                    APIClient.getClient()
+            )
+          //  Intent intent = new Intent(MainActivity.this, PrivacyActivity.class);
+            //intent.putExtra("Id", m_device.GetId());
+            //startActivity(intent);
         }
     };
 
@@ -96,10 +106,6 @@ public class MainActivity extends AppCompatActivity {
         serviceIntent.putExtra("Id", m_device.GetId());
         ContextCompat.startForegroundService(this, serviceIntent);
     }
-
-
-
-
 
 
 }

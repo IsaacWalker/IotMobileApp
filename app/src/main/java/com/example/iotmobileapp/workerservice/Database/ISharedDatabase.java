@@ -9,4 +9,6 @@ public interface ISharedDatabase<T>
     T take();
 
     List<T> take(int number);
+
+    int count();
 }

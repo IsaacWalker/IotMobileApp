@@ -34,18 +34,20 @@ public class PusherWorker implements Runnable
     {
         while(true)
         {
-
-            List<Scan> scans = m_scanDatabase.take(Config.PusherBatchSize.Value());
-            if(scans != null && scans.size() > 0)
+            if(m_scanDatabase.count() >= Config.MinLogBatchSize.Value())
             {
-                ScanBatch batch = new ScanBatch(m_userIdentity.GetDeviceId(), scans);
-                Call<Void> call = m_scanServiceClient.InsertScans(batch);
-                call.enqueue(scanCallback);
-            }
+                List<Scan> scans = m_scanDatabase.take(m_scanDatabase.count());
 
+                if(scans != null && scans.size() > 0)
+                {
+                    ScanBatch batch = new ScanBatch(m_userIdentity.GetDeviceId(), scans);
+                    Call<Void> call = m_scanServiceClient.InsertScans(batch);
+                    call.enqueue(scanCallback);
+                }
+            }
             try
             {
-                Thread.sleep(Config.PusherSleepTime.Value());
+                Thread.sleep(Config.LogSleepDuration.Value());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
