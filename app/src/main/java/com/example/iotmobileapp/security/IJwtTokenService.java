@@ -3,12 +3,13 @@ package com.example.iotmobileapp.security;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 
 public interface IJwtTokenService
 {
     @GET("/secret/nonce")
-    Call<String> getNonce();
+    Call<NonceModel> getNonce();
 
-    @GET("/secret/token")
+    @POST("/secret/tokenAttempt")
     Call<String> getToken(@Body TokenRequestModel tokenRequestModel);
 }

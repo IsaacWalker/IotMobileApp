@@ -1,10 +1,13 @@
 package com.example.iotmobileapp.security;
 
+import androidx.annotation.NonNull;
+
 import com.example.iotmobileapp.BuildConfig;
 import com.example.iotmobileapp.device.DeviceModel;
 import com.google.android.gms.safetynet.SafetyNet;
 import com.google.android.gms.safetynet.SafetyNetApi;
 import com.google.android.gms.safetynet.SafetyNetClient;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import retrofit2.Call;
@@ -35,34 +38,24 @@ public class GatewayTokenService implements IGatewayTokenService {
 
     @Override
     public String getCurrentToken() {
-        Call<String> call = m_tokenService.getNonce();
+        Call<NonceModel> call = m_tokenService.getNonce();
         call.enqueue(NonceCallback);
 
         return _currentToken;
     }
 
 
-    private Callback<String> NonceCallback = new Callback<String>()
+    private Callback<NonceModel> NonceCallback = new Callback<NonceModel>()
     {
         @Override
-        public void onResponse(Call<String> call, Response<String> response) {
-            String nonce = response.body();
-            SafetyNetApi.AttestationResponse attResponse =  m_safetyNetClient.attest(nonce.getBytes(),null)
-            .getResult();
-
-            String jwsResult = attResponse.getJwsResult();
-
-            TokenRequestModel tokenRequestModel = new TokenRequestModel();
-            tokenRequestModel.DeviceModel = m_deviceModel;
-            tokenRequestModel.Nonce = nonce;
-            tokenRequestModel.AttestationCypher = jwsResult;
-
-            Call<String> tokenCall = m_tokenService.getToken(tokenRequestModel);
-            tokenCall.enqueue(TokenCallback);
+        public void onResponse(Call<NonceModel> call, Response<NonceModel> response) {
+            NonceModel nonce = response.body();
+             m_safetyNetClient.attest(nonce.N.getBytes(),nonce.A)
+            .addOnCompleteListener(new GetAttestCallback(nonce.N));
         }
 
         @Override
-        public void onFailure(Call<String> call, Throwable t) {
+        public void onFailure(Call<NonceModel> call, Throwable t) {
 
         }
     };
@@ -80,4 +73,30 @@ public class GatewayTokenService implements IGatewayTokenService {
 
         }
     };
+
+    private class GetAttestCallback implements OnCompleteListener<SafetyNetApi.AttestationResponse>
+    {
+        private final String _nonce;
+
+
+        public GetAttestCallback(String nonce)
+        {
+            _nonce = nonce;
+        }
+
+
+        @Override
+        public void onComplete(@NonNull Task<SafetyNetApi.AttestationResponse> task) {
+            SafetyNetApi.AttestationResponse attResponse =  task.getResult();
+            String jwsResult = attResponse.getJwsResult();
+
+            TokenRequestModel tokenRequestModel = new TokenRequestModel();
+            tokenRequestModel.DeviceModel = m_deviceModel;
+            tokenRequestModel.Nonce = _nonce;
+            tokenRequestModel.AttestationCypher = jwsResult;
+
+            Call<String> tokenCall = m_tokenService.getToken(tokenRequestModel);
+            tokenCall.enqueue(TokenCallback);
+        }
+    }
 }

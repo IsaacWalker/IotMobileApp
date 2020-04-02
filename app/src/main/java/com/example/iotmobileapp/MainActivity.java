@@ -18,12 +18,16 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.iotmobileapp.device.Device;
+import com.example.iotmobileapp.device.DeviceModel;
 import com.example.iotmobileapp.device.IDevice;
 import com.example.iotmobileapp.device.IDeviceServiceClient;
 import com.example.iotmobileapp.gdpr.PrivacyActivity;
 import com.example.iotmobileapp.security.GatewayTokenService;
 import com.example.iotmobileapp.security.IGatewayTokenService;
+import com.example.iotmobileapp.security.IJwtTokenService;
 import com.example.iotmobileapp.workerservice.ForegroundService;
+import com.google.android.gms.safetynet.SafetyNet;
+import com.google.android.gms.safetynet.SafetyNetClient;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,12 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        m_device = new Device(
-                (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE),
-                BluetoothAdapter.getDefaultAdapter(),
-                APIClient.getClient("http://www.device.iotrelationshipfyp.com")
-                        .create(IDeviceServiceClient.class)
-        );
+        m_device = new Device( BluetoothAdapter.getDefaultAdapter());
 
         startServiceBtn = findViewById(R.id.startServiceBtn);
         startServiceBtn.setOnClickListener(StartServiceListener);
@@ -64,8 +63,6 @@ public class MainActivity extends AppCompatActivity {
 
         privacyBtn = findViewById(R.id.privacyBtn);
         privacyBtn.setOnClickListener(PrivacyButtonListener);
-
-        m_device.TryRegister();
     }
 
 
@@ -90,10 +87,19 @@ public class MainActivity extends AppCompatActivity {
     private View.OnClickListener PrivacyButtonListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            DeviceModel model = new DeviceModel();
+            model.Model = m_device.GetModel();
+            model.Manufacturer = m_device.GetManufacturer();
+            model.MacAddress = m_device.GetMacAddress();
+            model.BluetoothName = m_device.GetBluetoothName();
 
             IGatewayTokenService gatewayTokenService = new GatewayTokenService(
-                    APIClient.getClient()
-            )
+                    APIClient.getClient("http://www.iotrelationshipfyp.com")
+                    .create(IJwtTokenService.class),
+                    SafetyNet.getClient(MainActivity.this),
+                    model);
+
+            gatewayTokenService.getCurrentToken();
           //  Intent intent = new Intent(MainActivity.this, PrivacyActivity.class);
             //intent.putExtra("Id", m_device.GetId());
             //startActivity(intent);
@@ -103,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
     public void startService()
     {
         Intent serviceIntent = new Intent(this, ForegroundService.class);
-        serviceIntent.putExtra("Id", m_device.GetId());
+        serviceIntent.putExtra("Id", m_device.GetMacAddress());
         ContextCompat.startForegroundService(this, serviceIntent);
     }
 

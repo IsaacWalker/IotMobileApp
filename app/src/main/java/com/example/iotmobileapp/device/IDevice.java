@@ -9,10 +9,4 @@ public interface IDevice
     String GetMacAddress();
 
     String GetBluetoothName();
-
-    int GetId();
-
-    boolean IsRegistered();
-
-    void TryRegister();
 }

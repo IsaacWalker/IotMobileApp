@@ -21,21 +21,14 @@ public class Device implements IDevice
     private String _manufacturer;
     private String _macAddress;
     private String _bluetoothName;
-    private int _id;
-    private boolean _isRegistered;
 
-    private final IDeviceServiceClient m_deviceServiceClient;
-
-    public Device(WifiManager wifiManager,
-                  BluetoothAdapter bluetoothAdapter,
-                  IDeviceServiceClient serviceClient)
+    public Device(
+                  BluetoothAdapter bluetoothAdapter)
     {
-        _isRegistered = false;
         _model = Build.MODEL;
         _manufacturer = Build.MANUFACTURER;
         _macAddress = getMacAddr();
         _bluetoothName = bluetoothAdapter.getName();
-        m_deviceServiceClient = serviceClient;
     }
 
     @Override
@@ -58,29 +51,6 @@ public class Device implements IDevice
     @Override
     public String GetBluetoothName() {
         return _bluetoothName;
-    }
-
-    @Override
-    public int GetId() {
-        return _id;
-    }
-
-    @Override
-    public boolean IsRegistered() {
-        return _isRegistered;
-    }
-
-    @Override
-    public void TryRegister() {
-        Log.d("Register Device", "Trying to register");
-        DeviceModel model = new DeviceModel();
-        model.BluetoothName = _bluetoothName;
-        model.MacAddress = _macAddress;
-        model.Manufacturer = _manufacturer;
-        model.Model = _model;
-
-        Call<Integer> call =  m_deviceServiceClient.RegisterDevice(model);
-        call.enqueue(registerDeviceCallback);
     }
 
 
@@ -110,23 +80,4 @@ public class Device implements IDevice
 
         return "02:00:00:00:00:00";
     }
-
-    private final Callback<Integer> registerDeviceCallback = new Callback<Integer>()
-    {
-
-        @Override
-        public void onResponse(Call<Integer> call, Response<Integer> response) {
-            if(response.isSuccessful())
-            {
-                _id = response.body();
-                _isRegistered = true;
-                Log.d("Register Device", "Register Successful with Id " + _id);
-            }
-        }
-
-        @Override
-        public void onFailure(Call<Integer> call, Throwable t) {
-
-        }
-    };
 }
